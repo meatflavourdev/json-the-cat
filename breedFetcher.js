@@ -1,23 +1,26 @@
 // breedFetcher.js
-const request = require('request');
+const request = require("request");
 
-//Get command line args
-const args = process.argv.slice(2);
-const URL = 'https://api.thecatapi.com/v1/breeds/search?q=';
-const searchString = args[0].slice(0,4).toLowerCase();
-const requestURI = URL + searchString;
+// Configuratoion
+const URL = "https://api.thecatapi.com/v1/breeds/search?q=";
 
-request(requestURI, (error, response, body) => {
-  if (error) {
-    console.log('error:', error);
-    return;
-  }
+const fetchBreedDescription = function(breedID, callback) {
+  const requestURI = URL + breedID;
 
-  const data = JSON.parse(body);
+  request(requestURI, (error, response, body) => {
+    if (error) {
+      callback(error);
+      return;
+    }
 
-  if (data.length === 0) {
-    console.log('No Results!');
-    return;
-  }
-  console.log(data[0]);
-});
+    const data = JSON.parse(body);
+
+    if (data.length === 0) {
+      callback('No Results Found');
+      return;
+    }
+    callback(undefined, data[0].description);
+  });
+};
+
+module.exports = { fetchBreedDescription };
